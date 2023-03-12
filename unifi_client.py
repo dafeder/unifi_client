@@ -426,7 +426,7 @@ class UnifiAPIClient:
             raise UnifiAPIClientException(err_msg)
 
         network_traffic_category_map = yaml.load(mg[0], Loader=yaml.FullLoader)
-        network_traffic_application_map = yaml.load(mg[0], Loader=yaml.FullLoader)
+        network_traffic_application_map = yaml.load(mg[1], Loader=yaml.FullLoader)
 
         return network_traffic_category_map, network_traffic_application_map
 
@@ -456,10 +456,11 @@ app_stats = unifi_client.get_dpi_by_app("default")
 #print(json.dumps(unifi_client.get_site_dpi_by_app("default"), indent=4))
 
 cat_map, app_map = unifi_client.get_category_and_application_map()
+
 for device in app_stats["data"]:
     for stat in device["by_app"]:
-      stat["x_cat"] = cat_map[stat["cat"]]["name"]
-      stat["x_app"] = app_map.get(stat["app"], {"name": "__unlisted__"})["name"]
-
+        app_cat_id = (stat["cat"]<<16)+stat["app"]
+        stat["x_cat"] = cat_map[stat["cat"]]["name"]
+        stat["x_app"] = app_map.get(app_cat_id, {"name": "__unlisted__"})["name"]
 
 print(json.dumps(app_stats, indent=4))
