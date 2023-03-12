@@ -23,42 +23,19 @@ class UnifiAPIClient:
     all_stat_attributes = ['bytes', 'wan-tx_bytes', 'wan-rx_bytes', 'wlan_bytes', 'num_sta',
                            'lan-num_sta', 'wlan-num_sta', 'time', 'rx_bytes', 'tx_bytes']
 
-    dpi_app_categories = {
-        0:	"Instant messaging",
-        1:	"P2P",
-        3:	"File Transfer",
-        4:	"Streaming Media",
-        5:	"Mail and Collaboration",
-        6:	"Voice over IP",
-        7:	"Database",
-        8:	"Games",
-        9:	"Network Management",
-        10:	"Remote Access Terminals",
-        11:	"Bypass Proxies and Tunnels",
-        12:	"Stock Market",
-        13:	"Web",
-        14:	"Security Update",
-        15:	"Web IM",
-        17:	"Business",
-
-        18:	"Network Protocols",
-        19:	"Network Protocols",
-        20:	"Network Protocols",
-        23:	"Private Protocol",
-        24:	"Social Network",
-        255: "Unknown"
-    }
-
-
     def __init__(self,
                  controller_url,
                  authentication_username,
                  authentication_password,
-                 api_client_logger=logging.getLogger()):
+                 api_client_logger=logging.getLogger(),
+                 verify=None):
 
         self._logger = api_client_logger
         self._controller_url = controller_url
         self._controller_requests_session = requests.Session()
+
+        if verify is not None:
+            self._controller_requests_session.verify = verify
 
         # Login to the controller
         url_login = unifi_controller_url + "/api/login"
@@ -66,8 +43,7 @@ class UnifiAPIClient:
         credentials = {"username": authentication_username, "password": authentication_password}
         login_response = self._controller_requests_session.post(url_login,
                                                        headers={"content-type": "application/json"},
-                                                       data=json.dumps(credentials),
-                                                       verify=False)
+                                                       data=json.dumps(credentials))
 
         if login_response.status_code != 200:
             err_msg = f"{self} Login failed. HTTP request to {url_login} returned status code {login_response.status_code}. Expected 200."
@@ -81,8 +57,7 @@ class UnifiAPIClient:
         url_sites = unifi_controller_url + "/api/self/sites"
         self._logger.debug(f"Getting sites from {url_sites}")
         sites_response = self._controller_requests_session.get(url_sites,
-                                                      headers={"content-type": "application/json"},
-                                                      verify=False)
+                                                      headers={"content-type": "application/json"})
         if sites_response.status_code != 200:
             err_msg = f"{self} request to sites endpoint {url_sites} returned status code {sites_response.status_code}. Expected 200"
             self._logger.error(err_msg)
@@ -100,8 +75,7 @@ class UnifiAPIClient:
         url_devices = unifi_controller_url+"/api/s/"+site+"/stat/device"
         self._logger.debug(f"Getting devices for site {site} from {url_devices}")
         site_devices_response = self._controller_requests_session.get(url_devices,
-                                                               headers={"content-type": "application/json"},
-                                                               verify=False)
+                                                               headers={"content-type": "application/json"})
         if site_devices_response.status_code != 200:
             err_msg = f"{self} request to site devicess endpoint {url_devices} returned status code {site_devices_response.status_code}. Expected 200"
             self._logger.error(err_msg)
@@ -149,8 +123,7 @@ class UnifiAPIClient:
 
         stat_device_response = self._controller_requests_session.post(url_stat,
                                                                       headers={"content-type": "application/json"},
-                                                                      data=json.dumps(stat_request_parameters),
-                                                                      verify=False)
+                                                                      data=json.dumps(stat_request_parameters))
 
         if stat_device_response.status_code != 200:
             err_msg = f"{self} request to site stat endpoint {url_stat} returned status code {stat_device_response.status_code}. Expected 200"
@@ -211,8 +184,7 @@ class UnifiAPIClient:
         url_active_clients = unifi_controller_url + "/api/s/"+site+"/stat/sta"
         self._logger.debug(f"Getting active clients for site {site} from {url_active_clients}")
         site_active_clients_response = self._controller_requests_session.get(url_active_clients,
-                                                               headers={"content-type": "application/json"},
-                                                               verify=False)
+                                                               headers={"content-type": "application/json"})
         if site_active_clients_response.status_code != 200:
             err_msg = f"{self} request to site active clients endpoint {url_active_clients} returned status code {site_active_clients_response.status_code}. Expected 200"
             self._logger.error(err_msg)
@@ -230,8 +202,7 @@ class UnifiAPIClient:
         url_known_clients = unifi_controller_url + "/api/s/"+site+"/rest/user"
         self._logger.debug(f"Getting known clients for site {site} from {url_known_clients}")
         site_known_clients_response = self._controller_requests_session.get(url_known_clients,
-                                                               headers={"content-type": "application/json"},
-                                                               verify=False)
+                                                               headers={"content-type": "application/json"})
         if site_known_clients_response.status_code != 200:
             err_msg = f"{self} request to site known clients endpoint {url_known_clients} returned status code {site_known_clients_response.status_code}. Expected 200"
             self._logger.error(err_msg)
@@ -249,8 +220,7 @@ class UnifiAPIClient:
         url_spectrum_scan = unifi_controller_url + "/api/s/"+site+"/stat/spectrumscan"
         self._logger.debug(f"Getting spectrum for site {site} from {url_spectrum_scan}")
         site_spectrum_scan_response = self._controller_requests_session.get(url_spectrum_scan,
-                                                               headers={"content-type": "application/json"},
-                                                               verify=False)
+                                                               headers={"content-type": "application/json"})
         if site_spectrum_scan_response.status_code != 200:
             err_msg = f"{self} request to site spectrum scan endpoint {url_spectrum_scan} returned status code {site_spectrum_scan_response.status_code}. Expected 200"
             self._logger.error(err_msg)
@@ -267,8 +237,7 @@ class UnifiAPIClient:
         url_ddns_info = unifi_controller_url + "/api/s/"+site+"/stat/dynamicdns"
         self._logger.debug(f"Getting dynamic dns info for site {site} from {url_ddns_info}")
         site_ddns_response = self._controller_requests_session.get(url_ddns_info,
-                                                                   headers={"content-type": "application/json"},
-                                                                   verify=False)
+                                                                   headers={"content-type": "application/json"})
         if site_ddns_response.status_code != 200:
             err_msg = f"{self} request to site ddns info endpoint {url_ddns_info} returned status code {site_ddns_response.status_code}. Expected 200"
             self._logger.error(err_msg)
@@ -293,8 +262,7 @@ class UnifiAPIClient:
 
         site_site_dpi_app_response = self._controller_requests_session.post(url_site_dpi,
                                                                         headers={"content-type": "application/json"},
-                                                                        data=json.dumps(parameters),
-                                                                        verify=False)
+                                                                        data=json.dumps(parameters))
         if site_site_dpi_app_response.status_code != 200:
             err_msg = f"{self} request to site dpi by app info endpoint {url_site_dpi} returned status code {site_site_dpi_app_response.status_code}. Expected 200"
             self._logger.error(err_msg)
@@ -317,8 +285,7 @@ class UnifiAPIClient:
 
         site_site_dpi_cat_response = self._controller_requests_session.post(url_site_dpi,
                                                                         headers={"content-type": "application/json"},
-                                                                        data=json.dumps(parameters),
-                                                                        verify=False)
+                                                                        data=json.dumps(parameters))
         if site_site_dpi_cat_response.status_code != 200:
             err_msg = f"{self} request to site dpi by category info endpoint {url_site_dpi} returned status code {site_site_dpi_cat_response.status_code}. Expected 200"
             self._logger.error(err_msg)
@@ -345,8 +312,7 @@ class UnifiAPIClient:
 
         site_dpi_app_response = self._controller_requests_session.post(url_dpi,
                                                                         headers={"content-type": "application/json"},
-                                                                        data=json.dumps(parameters),
-                                                                        verify=False)
+                                                                        data=json.dumps(parameters))
         if site_dpi_app_response.status_code != 200:
             err_msg = f"{self} request to site dpi by app info endpoint {url_dpi} returned status code {site_dpi_app_response.status_code}. Expected 200"
             self._logger.error(err_msg)
@@ -370,8 +336,7 @@ class UnifiAPIClient:
 
         site_dpi_cat_response = self._controller_requests_session.post(url_dpi,
                                                                         headers={"content-type": "application/json"},
-                                                                        data=json.dumps(parameters),
-                                                                        verify=False)
+                                                                        data=json.dumps(parameters))
         if site_dpi_cat_response.status_code != 200:
             err_msg = f"{self} request to site dpi by category info endpoint {url_dpi} returned status code {site_dpi_cat_response.status_code}. Expected 200"
             self._logger.error(err_msg)
@@ -384,9 +349,9 @@ class UnifiAPIClient:
         return site_dpi_cat_response.json()
 
 
-
     def __str__(self):
         return f"UnifiAPIClient to {self._controller_url}"
+
 
     @staticmethod
     def uri_to_parts(unifi_uri):
@@ -398,19 +363,22 @@ class UnifiAPIClient:
 
         return  controller_url, username, password
 
+
     @staticmethod
     def thirty_min_ago():
         return int(arrow.utcnow().shift(minutes=-30).timestamp())*1000, int(arrow.utcnow().timestamp())*1000
+
 
     @staticmethod
     def one_hour_ago():
         return int(arrow.utcnow().shift(hours=-1).timestamp())*1000, int(arrow.utcnow().timestamp())*1000
 
+
     def get_category_and_application_map(self, angular_build="g9491db021"):
 
         dynamic_dpi_js = unifi_controller_url + "/manage/angular/" + angular_build + "/js/dynamic.dpi.js"
 
-        dpi_js_response = requests.get(dynamic_dpi_js, verify=False)
+        dpi_js_response = self._controller_requests_session.get(dynamic_dpi_js)
         if dpi_js_response.status_code != 200:
             err_msg = f"{self} request to get dynamic dpi js lib {dynamic_dpi_js} returned status code {dpi_js_response.status_code}. Expected 200"
             self._logger.error(err_msg)
@@ -431,6 +399,7 @@ class UnifiAPIClient:
         return network_traffic_category_map, network_traffic_application_map
 
 
+# Setting up a logger
 
 logger = logging.getLogger("UNIFI_CLIENT")
 logger.setLevel(logging.DEBUG)
@@ -440,26 +409,36 @@ formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(messag
 handler.setFormatter(formatter)
 logger.addHandler(handler)
 
+# set environment var UNIFI_URI to https://username:password@controler_address_ip
+
 if os.environ.get("UNIFI_URI") is None:
     print("Required environment var UNIFI_URI not set. Bailing")
     sys.exit(-1)
 
+# set environment var UNIFI_URI into it's parts
+
 unifi_controller_url, unifi_username, unifi_password = UnifiAPIClient.uri_to_parts(os.environ.get("UNIFI_URI"))
 
-unifi_client = UnifiAPIClient(unifi_controller_url, unifi_username, unifi_password, logger)
+# create a client instance. this will log in with the credentials provided
+unifi_client = UnifiAPIClient(unifi_controller_url, unifi_username, unifi_password, logger, verify=False)
+
+# Some examples of api calls
+
 #print(json.dumps(unifi_client.get_sites(), indent=4))
 #print(json.dumps(unifi_client.get_devices_for_default_site(), indent=4))
 #print(json.dumps(unifi_client.get_5min_ap_all_stats("default", *unifi_client.one_hour_ago()), indent=4))
 
+# Example of getting traffic stats and mapping the id value in the API results to human-readable
 app_stats = unifi_client.get_dpi_by_app("default")
-
-#print(json.dumps(unifi_client.get_site_dpi_by_app("default"), indent=4))
-
 cat_map, app_map = unifi_client.get_category_and_application_map()
 
+# Loop through the traffic results and add  x_app and x_cat keys for the human-readable
 for device in app_stats["data"]:
     for stat in device["by_app"]:
+
+        # the app human name is from the app id + the cat id sifted two bytes
         app_cat_id = (stat["cat"]<<16)+stat["app"]
+
         stat["x_cat"] = cat_map[stat["cat"]]["name"]
         stat["x_app"] = app_map.get(app_cat_id, {"name": "__unlisted__"})["name"]
 
