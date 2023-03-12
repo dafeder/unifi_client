@@ -4,6 +4,7 @@ import logging
 import sys
 import json
 import re
+import hashlib
 
 import requests
 import arrow
@@ -23,12 +24,18 @@ class UnifiAPIClient:
     all_stat_attributes = ['bytes', 'wan-tx_bytes', 'wan-rx_bytes', 'wlan_bytes', 'num_sta',
                            'lan-num_sta', 'wlan-num_sta', 'time', 'rx_bytes', 'tx_bytes']
 
+    network_traffic_category_map = None
+    network_traffic_category_map_hash = None
+    network_traffic_application_map = None
+    network_traffic_application_map_hash = None
+
     def __init__(self,
                  controller_url,
                  authentication_username,
                  authentication_password,
                  api_client_logger=logging.getLogger(),
-                 verify=None):
+                 verify=None,
+                 try_to_get_category_and_app_map=True):
 
         self._logger = api_client_logger
         self._controller_url = controller_url
@@ -51,6 +58,17 @@ class UnifiAPIClient:
             raise UnifiAPIClientException(err_msg)
 
         self._logger .debug(f"{self} logged in to controller OK")
+
+        if try_to_get_category_and_app_map:
+            try:
+                self.network_traffic_category_map, self.network_traffic_application_map = self.get_category_and_application_map()
+
+                self.network_traffic_category_map_hash = str(hashlib.sha256(bytes(json.dumps(self.network_traffic_category_map), 'utf-8')).hexdigest())
+                self.network_traffic_application_map_hash = str(hashlib.sha256(bytes(json.dumps(self.network_traffic_application_map), 'utf-8')).hexdigest())
+
+            except UnifiAPIClientException:
+                self._logger.info(f"{self} could not get the category and application map. See log for details")
+
 
     def get_sites(self):
 
@@ -260,19 +278,33 @@ class UnifiAPIClient:
         if filter_category_list is not None and len(filter_category_list) > 0:
             parameters["cats"] = filter_category_list
 
-        site_site_dpi_app_response = self._controller_requests_session.post(url_site_dpi,
+        site_dpi_app_response = self._controller_requests_session.post(url_site_dpi,
                                                                         headers={"content-type": "application/json"},
                                                                         data=json.dumps(parameters))
-        if site_site_dpi_app_response.status_code != 200:
-            err_msg = f"{self} request to site dpi by app info endpoint {url_site_dpi} returned status code {site_site_dpi_app_response.status_code}. Expected 200"
+        if site_dpi_app_response.status_code != 200:
+            err_msg = f"{self} request to site dpi by app info endpoint {url_site_dpi} returned status code {site_dpi_app_response.status_code}. Expected 200"
             self._logger.error(err_msg)
             raise UnifiAPIClientException(err_msg)
 
         self._logger.debug(f"Got site dpi by app from {url_site_dpi} OK")
 
+        response_site_app_stats = site_dpi_app_response.json()
+
+        if len(response_site_app_stats["data"]) > 0 and self.network_traffic_application_map is not None and self.network_traffic_category_map is not None:
+            self._logger.debug("Going to attempt to map stat application and category ids to human readable text")
+
+            for stat in response_site_app_stats["data"][0].get("by_app", []):
+                # the app human name is from the app id + the cat id sifted two bytes
+                app_cat_id = (stat["cat"] << 16) + stat["app"]
+
+                stat["x_cat"] = self.network_traffic_category_map[stat["cat"]]["name"]
+                stat["x_app"] = self.network_traffic_application_map.get(app_cat_id, {"name": "__unlisted__"})["name"]
+                stat["x_cat_app_id"] = self.network_traffic_category_map_hash+":"+self.network_traffic_application_map_hash
+
+
         # TODO Write sites known clients response JSON schema
         # TODO Check sites known clients response against JSON schema
-        return site_site_dpi_app_response.json()
+        return response_site_app_stats
 
 
     def get_site_dpi_by_category(self, site):
@@ -320,9 +352,23 @@ class UnifiAPIClient:
 
         self._logger.debug(f"Got site dpi by app from {url_dpi} OK")
 
+        response_app_stats = site_dpi_app_response.json()
+
+        if self.network_traffic_application_map is not None and self.network_traffic_category_map is not None:
+            self._logger.debug("Going to attempt to map stat application and category ids to human readable text")
+
+            for device in response_app_stats["data"]:
+                for stat in device["by_app"]:
+                    # the app human name is from the app id + the cat id sifted two bytes
+                    app_cat_id = (stat["cat"] << 16) + stat["app"]
+
+                    stat["x_cat"] = self.network_traffic_category_map[stat["cat"]]["name"]
+                    stat["x_app"] = self.network_traffic_application_map.get(app_cat_id, {"name": "__unlisted__"})["name"]
+                    stat["x_cat_app_id"] = self.network_traffic_category_map_hash+":"+self.network_traffic_application_map_hash
+
         # TODO Write sites known clients response JSON schema
         # TODO Check sites known clients response against JSON schema
-        return site_dpi_app_response.json()
+        return response_app_stats
 
     def get_dpi_by_category(self, site, filter_mac_list=None):
 
@@ -348,6 +394,47 @@ class UnifiAPIClient:
         # TODO Check sites known clients response against JSON schema
         return site_dpi_cat_response.json()
 
+    def run_speed_test(self, site):
+
+        url_devmgr = unifi_controller_url + "/api/s/"+site+"/cmd/devmgr"
+        parameters = {"cmd": "speedtest"}
+
+        speed_test_response = self._controller_requests_session.post(url_devmgr,
+                                                                     headers={"content-type": "application/json"},
+                                                                     data=json.dumps(parameters)
+                                                                     )
+
+        if speed_test_response.status_code != 200:
+            err_msg = f"{self} request to site start speed test endpoint {url_devmgr} returned status code {speed_test_response.status_code}. Expected 200"
+            self._logger.error(err_msg)
+            raise UnifiAPIClientException(err_msg)
+
+        self._logger.debug(f"Send speed test command {url_devmgr} OK")
+
+        # TODO Write sites known clients response JSON schema
+        # TODO Check sites known clients response against JSON schema
+        return speed_test_response.json()
+
+    def status_speed_test(self, site):
+
+        url_devmgr = unifi_controller_url + "/api/s/" + site + "/cmd/devmgr"
+        parameters = {"cmd": "speedtest-status"}
+
+        speed_test_response = self._controller_requests_session.post(url_devmgr,
+                                                                     headers={"content-type": "application/json"},
+                                                                     data=json.dumps(parameters)
+                                                                     )
+
+        if speed_test_response.status_code != 200:
+            err_msg = f"{self} request to site start speed test endpoint {url_devmgr} returned status code {speed_test_response.status_code}. Expected 200"
+            self._logger.error(err_msg)
+            raise UnifiAPIClientException(err_msg)
+
+        self._logger.debug(f"Send speed test command {url_devmgr} OK")
+
+        # TODO Write sites known clients response JSON schema
+        # TODO Check sites known clients response against JSON schema
+        return speed_test_response.json()
 
     def __str__(self):
         return f"UnifiAPIClient to {self._controller_url}"
@@ -374,17 +461,47 @@ class UnifiAPIClient:
         return int(arrow.utcnow().shift(hours=-1).timestamp())*1000, int(arrow.utcnow().timestamp())*1000
 
 
-    def get_category_and_application_map(self, angular_build="g9491db021"):
+    def get_category_and_application_map(self, angular_build_str_list=None):
 
-        dynamic_dpi_js = unifi_controller_url + "/manage/angular/" + angular_build + "/js/dynamic.dpi.js"
+        if angular_build_str_list is None or len(angular_build_str_list) < 1:
+            # Try to figure out the angular 'build' string
+            login_page_url =  self._controller_url + "/manage/account/login"
+            login_page_response = self._controller_requests_session.get(login_page_url)
+            if login_page_response.status_code != 200:
+                err_msg = f"{self} request to get login page at {login_page_url} to determine angular build string failed. Returned status code {login_page_response.status_code}. Expected 200"
+                self._logger.error(err_msg)
+                raise UnifiAPIClientException(err_msg)
+            build_stings_in_text = re.findall(r'angular/([a-zA-Z0-9.]*)/js/', login_page_response.text)
 
-        dpi_js_response = self._controller_requests_session.get(dynamic_dpi_js)
-        if dpi_js_response.status_code != 200:
-            err_msg = f"{self} request to get dynamic dpi js lib {dynamic_dpi_js} returned status code {dpi_js_response.status_code}. Expected 200"
-            self._logger.error(err_msg)
-            raise UnifiAPIClientException(err_msg)
+            if len(build_stings_in_text) < 1:
+                err_msg = f"{self} could not determine angular build string from login page {login_page_url} to. Regex found no instances of angular/(build string))/js"
+                self._logger.error(err_msg)
+                raise UnifiAPIClientException(err_msg)
+        else:
+            # used the strings passed in
+            build_stings_in_text = angular_build_str_list
 
-        beautified_dpi_js = jsbeautifier.beautify(dpi_js_response.text)
+        # Typically I've only found one build string on a page but in case there are multiples, loop
+        beautified_dpi_js = None
+        for angular_build in set(build_stings_in_text):
+            dynamic_dpi_js = unifi_controller_url + "/manage/angular/" + angular_build + "/js/dynamic.dpi.js"
+
+            self._logger.debug(f"Trying {dynamic_dpi_js} for category / app mapping javascript page")
+
+            dpi_js_response = self._controller_requests_session.get(dynamic_dpi_js)
+            if dpi_js_response.status_code == 200:
+                self._logger.debug(f"Found {dynamic_dpi_js} for category / app mapping javascript page")
+                beautified_dpi_js = jsbeautifier.beautify(dpi_js_response.text)
+                break
+            else:
+                self._logger.debug(f"Miss {dynamic_dpi_js} for category / app mapping javascript page. Status code is {dpi_js_response.status_code}")
+                # ignore 404s
+                continue
+
+        if beautified_dpi_js is None:
+                err_msg = f"{self} Could not find category / app mapping javascript page"
+                self._logger.error(err_msg)
+                raise UnifiAPIClientException(err_msg)
 
         mg = re.match(".*categories: (.*),.*            applications:(.*)}\n    \}, \{\}\],\n    2\:", beautified_dpi_js, re.DOTALL).groups()
 
@@ -422,6 +539,12 @@ unifi_controller_url, unifi_username, unifi_password = UnifiAPIClient.uri_to_par
 # create a client instance. this will log in with the credentials provided
 unifi_client = UnifiAPIClient(unifi_controller_url, unifi_username, unifi_password, logger, verify=False)
 
+#spd_run = unifi_client.run_speed_test("default")
+#print(json.dumps(spd_run, indent=4))
+#print(json.dumps(unifi_client.status_speed_test("default"), indent=4))
+
+print(json.dumps(unifi_client.get_site_dpi_by_app("default"), indent=4))
+
 # Some examples of api calls
 
 #print(json.dumps(unifi_client.get_sites(), indent=4))
@@ -429,17 +552,5 @@ unifi_client = UnifiAPIClient(unifi_controller_url, unifi_username, unifi_passwo
 #print(json.dumps(unifi_client.get_5min_ap_all_stats("default", *unifi_client.one_hour_ago()), indent=4))
 
 # Example of getting traffic stats and mapping the id value in the API results to human-readable
-app_stats = unifi_client.get_dpi_by_app("default")
-cat_map, app_map = unifi_client.get_category_and_application_map()
-
-# Loop through the traffic results and add  x_app and x_cat keys for the human-readable
-for device in app_stats["data"]:
-    for stat in device["by_app"]:
-
-        # the app human name is from the app id + the cat id sifted two bytes
-        app_cat_id = (stat["cat"]<<16)+stat["app"]
-
-        stat["x_cat"] = cat_map[stat["cat"]]["name"]
-        stat["x_app"] = app_map.get(app_cat_id, {"name": "__unlisted__"})["name"]
-
-print(json.dumps(app_stats, indent=4))
+#app_stats = unifi_client.get_dpi_by_app("default")
+#print(json.dumps(app_stats, indent=4))
