@@ -58,7 +58,7 @@ fig = px.bar(traffic_data_frame, x="mac", y="tx_bytes", color="category", title=
 fig.show()
 
 ```
-![](/Users/pickard/projects/unifi_client/docs/media/graph_traffic_example_output.png)
+![](docs/media/graph_traffic_example_output.png)
 
 ## Controller Support
 
