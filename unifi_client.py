@@ -70,6 +70,20 @@ class UnifiAPIClient:
                 self._logger.info(f"{self} could not get the category and application map. See log for details")
 
 
+    def get_self(self):
+
+        url_self = unifi_controller_url + "/api/self"
+        self._logger.debug(f"Getting self from {url_self}")
+        self_response = self._controller_requests_session.get(url_self, headers={"content-type": "application/json"})
+
+        if self_response.status_code != 200:
+            err_msg = f"{self} request to self endpoint {url_self} returned status code {self_response.status_code}. Expected 200"
+            self._logger.error(err_msg)
+            raise UnifiAPIClientException(err_msg)
+
+        return self_response.json()
+
+
     def get_sites(self):
 
         url_sites = unifi_controller_url + "/api/self/sites"
@@ -87,6 +101,37 @@ class UnifiAPIClient:
         # TODO Check sites response against JSON schema
         return sites_response.json()
 
+
+    def get_self_site_stats(self):
+
+        url_sites_stats  = unifi_controller_url + "/api/stat/sites"
+        self._logger.debug(f"Getting sites stats from {url_sites_stats}")
+        sites_stats_response = self._controller_requests_session.get(url_sites_stats,
+                                                               headers={"content-type": "application/json"})
+        if sites_stats_response.status_code != 200:
+            err_msg = f"{self} request to sites stats endpoint {url_sites_stats} returned status code {sites_stats_response.status_code}. Expected 200"
+            self._logger.error(err_msg)
+            raise UnifiAPIClientException(err_msg)
+
+        self._logger.debug(f"Got sites stats from {url_sites_stats} OK")
+
+        # TODO Write sites response JSON schema
+        # TODO Check sites response against JSON schema
+        return sites_stats_response.json()
+
+    """
+    url_site_health = unifi_controller_url+"/api/s/"+site+"/stat/health"
+    url_site_self =  unifi_controller_url+"/api/s/"+site+"/self"
+    url_site_country_code = unifi_controller_url+"/api/s/"+site+"/stat/ccode"
+    url_site_current_channel = unifi_controller_url+"/api/s/"+site+"/stat/current-channel"
+    url_site_sysinfo = unifi_controller_url+"/api/s/"+site+"/stat/sysinfo"
+    url_site_events = unifi_controller_url+"/api/s/"+site+"/stat/event"
+        url_site_events = unifi_controller_url+"/api/s/"+site+"/rest/event" (most recent)
+    url_site_alarms = unifi_controller_url+"/api/s/"+site+"/stat/alarm"
+        url_site_alarms = unifi_controller_url+"/api/s/"+site+"/rest/alarm" (most recent)
+    url_devices_basic = unifi_controller_url+"/api/s/"+site+"stat/device-basic"
+     
+    """
 
     def get_devices_for_site(self, site):
 
@@ -539,11 +584,14 @@ unifi_controller_url, unifi_username, unifi_password = UnifiAPIClient.uri_to_par
 # create a client instance. this will log in with the credentials provided
 unifi_client = UnifiAPIClient(unifi_controller_url, unifi_username, unifi_password, logger, verify=False)
 
+print(json.dumps(unifi_client.get_self_site_stats(), indent=4))
+
+
 #spd_run = unifi_client.run_speed_test("default")
 #print(json.dumps(spd_run, indent=4))
 #print(json.dumps(unifi_client.status_speed_test("default"), indent=4))
 
-print(json.dumps(unifi_client.get_site_dpi_by_app("default"), indent=4))
+#print(json.dumps(unifi_client.get_site_dpi_by_app("default"), indent=4))
 
 # Some examples of api calls
 
