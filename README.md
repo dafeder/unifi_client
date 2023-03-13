@@ -36,6 +36,30 @@ site_traffic_stats =  unifi_client.get_5min_ap_all_stats(site, *unifi_client_uti
 print(json.dumps(site_traffic_stats, indent=4))
 ```
 
+Output of from methods are JSON which can be fed into other tools
+
+Partial code example of graphing with plotly. Full code in example folder
+```
+
+traffic_stats = unifi_client.get_dpi_by_app("default")
+
+pd = {'mac':[], 'tx_bytes':[], 'category': []}
+for device in traffic_stats["data"]:
+    mac = device["mac"]
+    for app in device["by_app"]:
+        pd['mac'].append(mac)
+        pd['tx_bytes'].append(app['tx_bytes'])
+        pd['category'].append(f"{app['x_app']} ({app['x_cat']})")
+
+
+traffic_data_frame= pandas.DataFrame(data=pd)
+
+fig = px.bar(traffic_data_frame, x="mac", y="tx_bytes", color="category", title="Traffic")
+fig.show()
+
+```
+![](/Users/pickard/projects/unifi_client/docs/media/graph_traffic_example_output.png)
+
 ## Controller Support
 
 The client only supports direct access to Cloud Keys. The Unifi web portal is not supported.

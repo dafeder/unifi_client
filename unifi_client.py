@@ -352,7 +352,7 @@ class UnifiAPIClient:
             self._logger.error(err_msg)
             raise UnifiAPIClientException(err_msg)
 
-        self._logger.debug(f"Got site ddns info from {url_site_dpi} OK")
+        self._logger.debug(f"Got site dpi by category info from {url_site_dpi} OK")
 
         # TODO Write sites dpi by cat response JSON schema
         # TODO Check sites dpi by cat response against JSON schema
