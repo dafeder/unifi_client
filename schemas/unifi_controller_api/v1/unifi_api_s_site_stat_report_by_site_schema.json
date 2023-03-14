@@ -1,0 +1,54 @@
+{
+  "$id": "https://example.com/unifi_api_***",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Unifi Controller API Traffic Stats By Site",
+  "type": "object",
+  "properties": {
+    "meta": {
+      "type": "object",
+      "properties": {
+        "rc": {
+          "type": "string",
+          "enum": [
+            "ok"
+          ]
+        }
+      },
+      "required": [
+        "rc"
+      ],
+      "additionalProperties": false
+    },
+    "data": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/site_traffic_stat"
+      }
+    }
+  },
+  "required": [
+    "meta",
+    "data"
+  ],
+  "additionalProperties": false,
+  "$defs": {
+    "site_traffic_stat": {
+      "type": "object",
+      "properties": {
+        "wan-tx_bytes": {"type": "number"},
+        "wan-rx_bytes": {"type": "number"},
+        "wlan_bytes": {"type": "number"},
+        "num_sta": {"type": "number"},
+        "lan-num_sta": {"type": "number"},
+        "wlan-num_sta": {"type": "number"},
+        "time": {"type": "number"},
+        "site": {"type": "string"},
+        "o": {"type": "string"},
+        "oid": {"type": "string"}
+      },
+      "required": ["oid","o","site","time","wlan-num_sta","lan-num_sta","num_sta","wan-tx_bytes", "wan-rx_bytes", "wlan_bytes"],
+      "additionalProperties": false
+    }
+  }
+}
+

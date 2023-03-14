@@ -1,0 +1,473 @@
+{
+  "$id": "https://example.com/unifi_api_site_stat_device",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Unifi Controller API Device details",
+  "type": "object",
+  "properties": {
+    "meta": {
+      "type": "object",
+      "properties": {
+        "rc": {
+          "type": "string",
+          "enum": ["ok"]
+        }
+      },
+      "required": ["rc"],
+      "additionalProperties": false
+    },
+    "data": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/device"
+      }
+    }
+  },
+  "required": ["meta", "data"],
+  "additionalProperties": false,
+
+  "$defs": {
+    "device": {
+      "type": "object",
+      "properties": {
+        "_id": {"type": "string"},
+        "adopted": {"type": "boolean"},
+        "adopted_by_client": {"type": "string"},
+        "adoption_completed": {"type": "boolean"},
+        "anomalies": {"type": "number"},
+        "anon_id": {"type": "string"},
+        "architecture": {"type": "string"},
+        "board_rev": {"type": "number"},
+        "cfgversion": {"type": "string"},
+        "config_network": {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string"
+            },
+            "ip": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false,
+          "required": []
+        },
+        "connected_at": {"type": "number"},
+        "dot1x_portctrl_enabled": {"type": "boolean"},
+        "ethernet_table": {},
+        "flowctrl_enabled": {"type": "boolean"},
+        "fw_caps": {"type": "number"},
+        "gateway_mac": {"type": "string"},
+        "has_fan": {"type": "boolean"},
+        "has_temperature": {"type": "boolean"},
+        "hash_id": {"type": "string"},
+        "hw_caps": {"type": "number"},
+        "inform_ip": {"type": "string"},
+        "inform_url": {"type": "string"},
+        "internet": {"type": "boolean"},
+        "ip": {"type": "string"},
+        "jumboframe_enabled": {"type": "boolean"},
+        "kernel_version": {"type": "string"},
+        "last_uplink": {
+          "type": "object",
+          "properties": {
+            "uplink_mac": {"type": "string"},
+            "port_idx": {"type": "number"},
+            "type": {"type": "string"},
+            "uplink_remote_port": {"type": "number"}
+          },
+          "additionalProperties": false,
+          "required": []
+        },
+        "license_state": {"type": "string"},
+        "mac": {"type": "string"},
+        "manufacturer_id": {"type": "number"},
+        "model": {"type": "string"},
+        "model_in_eol": {"type": "boolean"},
+        "model_in_lts": {"type": "boolean"},
+        "model_incompatible": {"type": "boolean"},
+        "port_table": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/device_port"
+          }
+        },
+        "power_source_ctrl_enabled": {"type": "boolean"},
+        "provisioned_at": {"type": "number"},
+        "required_version": {"type": "string"},
+        "satisfaction": {"type": "number"},
+        "serial": {"type": "string"},
+        "setup_id": {"type": "string"},
+        "site_id": {"type": "string"},
+        "stp_priority": {"type": "string"},
+        "stp_version": {"type": "string"},
+        "switch_caps": {
+          "type": "object",
+          "properties": {
+            "feature_caps": {"type": "number"},
+            "max_mirror_sessions": {"type": "number"},
+            "max_aggregate_sessions": {"type": "number"},
+            "max_l3_intf": {"type": "number"},
+            "max_reserved_routes": {"type": "number"},
+            "max_static_routes": {"type": "number"}
+          },
+          "additionalProperties": false,
+          "required": []
+        },
+        "sys_error_caps": {"type": "number"},
+        "syslog_key": {"type": "string"},
+        "two_phase_adopt": {"type": "boolean"},
+        "type": {"type": "string"},
+        "unsupported": {"type": "boolean"},
+        "unsupported_reason": {"type": "number"},
+        "version": {"type": "string"},
+        "x_aes_gcm": {"type": "boolean"},
+        "x_authkey": {"type": "string"},
+        "x_ssh_hostkey_fingerprint": {"type": "string"},
+        "device_id": {"type": "string"},
+        "uplink": {
+          "type": "object",
+          "properties": {
+            "bytes-r": {"type": "number"},
+            "drops": {"type": "number"},
+            "enable":{"type": "boolean"},
+            "gateways": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "latency": {"type": "number"},
+            "nameservers": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "speedtest_lastrun": {"type": "number"},
+            "speedtest_ping": {"type": "number"},
+            "speedtest_status": {"type": "string"},
+            "uptime": {"type": "number"},
+            "xput_down": {"type": "number"},
+            "xput_up": {"type": "number"},
+            "max_vlan": {
+              "type": "number"
+            },
+            "uplink_remote_port": {
+              "type": "number"
+            },
+            "full_duplex": {
+              "type": "boolean"
+            },
+            "ip": {
+              "type": "string"
+            },
+            "mac": {
+              "type": "string"
+            },
+            "name": {
+              "type": "string"
+            },
+            "netmask": {
+              "type": "string"
+            },
+            "num_port": {
+              "type": "number"
+            },
+            "rx_bytes": {
+              "type": "number"
+            },
+            "rx_dropped": {
+              "type": "number"
+            },
+            "rx_errors": {
+              "type": "number"
+            },
+            "rx_multicast": {
+              "type": "number"
+            },
+            "rx_packets": {
+              "type": "number"
+            },
+            "speed": {
+              "type": "number"
+            },
+            "tx_bytes": {
+              "type": "number"
+            },
+            "tx_dropped": {
+              "type": "number"
+            },
+            "tx_errors": {
+              "type": "number"
+            },
+            "tx_packets": {
+              "type": "number"
+            },
+            "up": {
+              "type": "boolean"
+            },
+            "port_idx": {
+              "type": "number"
+            },
+            "media": {
+              "type": "string"
+            },
+            "max_speed": {
+              "type": "number"
+            },
+            "uplink_mac": {
+              "type": "string"
+            },
+            "uplink_source": {
+              "type": "string"
+            },
+            "type": {
+              "type": "string"
+            },
+            "tx_bytes-r": {
+              "type": "number"
+            },
+            "rx_bytes-r": {
+              "type": "number"
+            },
+            "uplink_device_name": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false,
+          "required": []
+        },
+        "state": {"type": "number"},
+        "start_disconnected_millis": {"type": "number"},
+        "start_connected_millis": {"type": "number"},
+        "last_seen": {"type": "number"},
+        "next_interval": {"type": "number"},
+        "disconnection_reason": {"type": "string"},
+        "default": {"type": "boolean"},
+        "discovered_via": {"type": "string"},
+        "adopt_ip": {"type": "string"},
+        "adopt_url": {"type": "string"},
+        "x_adopt_username": {"type": "string"},
+        "x_adopt_password": {"type": "string"},
+        "adopt_state": {"type": "number"},
+        "adopt_tries": {"type": "number"},
+        "min_inform_interval_seconds": {"type": "number"},
+        "upgradable": {"type": "boolean"},
+        "adoptable_when_upgraded": {"type": "boolean"},
+        "rollupgrade": {"type": "boolean"},
+        "known_cfgversion": {"type": "string"},
+        "uptime": {"type": "number"},
+        "_uptime": {"type": "number"},
+        "locating": {"type": "boolean"},
+        "prev_non_busy_state": {"type": "number"},
+        "connect_request_ip": {"type": "string"},
+        "connect_request_port": {"type": "string"},
+        "sys_stats": {
+          "type": "object",
+          "properties": {
+            "loadavg_1": {"type": "string"},
+            "loadavg_15": {"type": "string"},
+            "loadavg_5": {"type": "string"},
+            "mem_buffer": {"type": "number"},
+            "mem_total": {"type": "number"},
+            "mem_used": {"type": "number"}
+          },
+          "additionalProperties": false,
+          "required": []
+        },
+        "system-stats": {
+          "type": "object",
+          "properties": {
+            "cpu": {"type": "string"},
+            "mem": {"type": "string"},
+            "uptime": {"type": "string"}
+          },
+          "additionalProperties": false,
+          "required": []
+        },
+        "ssh_session_table": {"type": "array"},
+        "lldp_table": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/lldp_table_entry"}
+        },
+        "displayable_version": {"type": "string"},
+        "connection_network_name": {"type": "string"},
+        "startup_timestamp": {"type": "number"},
+        "is_access_point": {"type": "boolean"},
+        "fan_level": {"type": "number"},
+        "general_temperature": {"type": "number"},
+        "overheating": {"type": "boolean"},
+        "total_max_power": {"type": "number"},
+        "downlink_table": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/downlink_table_entry"
+          }
+        },
+        "uplink_depth": {"type": "number"},
+        "dhcp_server_table": {"type": "array"},
+        "stat": {
+          "type": "object",
+          "properties": {
+            "sw": {"$ref": "#/$defs/stat_sw"}
+          }
+        },
+        "tx_bytes": {"type": "number"},
+        "rx_bytes": {"type": "number"},
+        "bytes": {"type": "number"},
+        "num_sta": {"type": "number"},
+        "user-num_sta": {"type": "number"},
+        "guest-num_sta": {"type": "number"},
+        "x_has_ssh_hostkey": {"type": "boolean"}
+      }
+    },
+    "device_port": {
+      "type": "object",
+      "properties": {
+        "port_idx": {"type": "number"},
+        "media": {"type": "string"},
+        "port_poe": {"type": "boolean"},
+        "poe_caps": {"type": "number"},
+        "speed_caps": {"type": "number"},
+        "op_mode": {"type": "string"},
+        "portconf_id": {"type": "string"},
+        "anomalies": {"type": "number"},
+        "autoneg": {"type": "boolean"},
+        "dot1x_mode": {"type": "string"},
+        "dot1x_status": {"type": "string"},
+        "enable": {"type": "boolean"},
+        "flowctrl_rx": {"type": "boolean"},
+        "flowctrl_tx": {"type": "boolean"},
+        "full_duplex": {"type": "boolean"},
+        "is_uplink": {"type": "boolean"},
+        "jumbo": {"type": "boolean"},
+        "rx_broadcast": {"type": "number"},
+        "rx_bytes": {"type": "number"},
+        "rx_dropped": {"type": "number"},
+        "rx_errors": {"type": "number"},
+        "rx_multicast": {"type": "number"},
+        "rx_packets": {"type": "number"},
+        "satisfaction": {"type": "number"},
+        "satisfaction_reason": {"type": "number"},
+        "speed": {"type": "number"},
+        "stp_pathcost": {"type": "number"},
+        "stp_state": {"type": "string"},
+        "tx_broadcast": {"type": "number"},
+        "tx_bytes": {"type": "number"},
+        "tx_dropped": {"type": "number"},
+        "tx_errors": {"type": "number"},
+        "tx_multicast": {"type": "number"},
+        "tx_packets": {"type": "number"},
+        "up": {"type": "boolean"},
+        "tx_bytes-r": {"type": "number"},
+        "rx_bytes-r": {"type": "number"},
+        "bytes-r": {"type": "number"},
+        "name": {"type": "string"},
+        "masked": {"type": "boolean"},
+        "aggregated_by": {"type": "boolean"},
+        "mac_table": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/mac_table_entry"}
+        }
+      }
+    },
+    "ethernet_table_entry": {
+      "type": "object",
+      "properties": {
+        "mac": {"type": "string"},
+        "num_port": {"type": "number"},
+        "name": {"type": "string"}
+      },
+      "additionalProperties": false,
+      "required": []
+    },
+    "lldp_table_entry": {
+      "type": "object",
+      "properties": {
+        "chassis_descr": {"type": "string"},
+        "port_descr": {"type": "string"},
+        "chassis_id": {"type": "string"},
+        "is_wired": {"type": "boolean"},
+        "local_port_idx": {"type": "number"},
+        "local_port_name": {"type": "string"},
+        "port_id": {"type": "string"}
+      },
+      "additionalProperties": false,
+      "required": []
+    },
+    "downlink_table_entry": {
+      "type": "object",
+      "properties": {
+        "mac": {"type": "string"},
+        "port_idx": {"type": "number"},
+        "speed": {"type": "number"},
+        "full_duplex": {"type": "boolean"}
+      },
+      "additionalProperties": false,
+      "required": []
+    },
+    "mac_table_entry": {
+      "type": "object",
+      "properties": {
+        "age": {"type": "number"},
+        "hostname": {"type": "string"},
+        "ip": {"type": "string"},
+        "mac": {"type": "string"},
+        "static": {"type": "boolean"},
+        "uptime": {"type": "number"},
+        "vlan": {"type": "number"},
+        "wevent_age": {"type": "number"},
+        "wevent_type": {"type": "string"},
+        "is_only_station_on_port": {"type": "boolean"},
+        "port_delta": {
+          "type": "object",
+          "properties": {
+            "time_delta": {"type": "number"},
+            "time_delta_activity": {"type": "number"},
+            "tx_bytes": {"type": "number"},
+            "rx_bytes": {"type": "number"},
+            "tx_packets": {"type": "number"},
+            "rx_packets": {"type": "number"}
+          },
+          "additionalProperties": false,
+          "required": []
+        }
+      },
+      "additionalProperties": false,
+      "required": []
+    },
+    "stat_sw": {
+      "type": "object",
+      "properties": {
+        "site_id": {"type": "string"},
+        "o": {"type": "string"},
+        "oid": {"type": "string"},
+        "sw": {"type": "string"},
+        "time": {"type": "number"},
+        "datetime": {"type": "string"},
+        "rx_packets": {"type": "number"},
+        "rx_bytes": {"type": "number"},
+        "rx_errors": {"type": "number"},
+        "rx_dropped": {"type": "number"},
+        "rx_crypts": {"type": "number"},
+        "rx_frags": {"type": "number"},
+        "tx_packets": {"type": "number"},
+        "tx_bytes": {"type": "number"},
+        "tx_errors": {"type": "number"},
+        "tx_dropped": {"type": "number"},
+        "tx_retries": {"type": "number"},
+        "rx_multicast": {"type": "number"},
+        "rx_broadcast": {"type": "number"},
+        "tx_multicast": {"type": "number"},
+        "tx_broadcast": {"type": "number"},
+        "bytes": {"type": "number"},
+        "duration": {"type": "number"}
+      },
+      "patternProperties" : {"^port_": {"type": "number"}},
+      "additionalProperties": false,
+      "required": []
+    }
+
+  }
+}
+

@@ -68,16 +68,18 @@ controller_data_results_dict[f"get_site_dpi_by_app ({site})"] = {"end_point": f"
 
 controller_data_results_dict[f"get_site_dpi_by_category ({site})"] = {"end_point": f"/api/s/{site}/stat/sitedpi", "result": unifi_client.get_site_dpi_by_category(site)}
 
-controller_data_results_dict[f"get_dpi_by_app ({site})"] = {"end_point": f"/api/s/{site}/stat/statdpi", "result": unifi_client.get_dpi_by_app(site)}
+controller_data_results_dict[f"get_dpi_by_app ({site})"] = {"end_point": f"/api/s/{site}/stat/stadpi", "result": unifi_client.get_dpi_by_app(site)}
 
-controller_data_results_dict[f"get_dpi_by_category ({site})"] = {"end_point": f"/api/s/{site}/stat/statdpi", "result": unifi_client.get_dpi_by_category(site)}
+controller_data_results_dict[f"get_dpi_by_category ({site})"] = {"end_point": f"/api/s/{site}/stat/stadpi", "result": unifi_client.get_dpi_by_category(site)}
 
 controller_data_results_dict[f"run_speed_test ({site})"] = {"end_point": f"/api/s/{site}/cmd/devmgr", "result": unifi_client.run_speed_test(site)}
 
 controller_data_results_dict[f"status_speed_test ({site})"] = {"end_point": f"/api/s/{site}/cmd/devmgr", "result": unifi_client.status_speed_test(site)}
 
+with open("../local/ever_result.json", "w+") as jf:
+    json.dump(controller_data_results_dict, jf)
 
-print(json.dumps(controller_data_results_dict, indent=4))
+#print(json.dumps(controller_data_results_dict, indent=4))
 
 # spd_run = unifi_client.run_speed_test("default")
 # print(json.dumps(spd_run, indent=4))

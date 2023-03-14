@@ -1,0 +1,135 @@
+{
+  "$id": "https://example.com/unifi_api_s_site_rest_sta",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Unifi Controller API Known Site Clients",
+  "type": "object",
+  "properties": {
+    "meta": {
+      "type": "object",
+      "properties": {
+        "rc": {
+          "type": "string",
+          "enum": ["ok"]
+        }
+      },
+      "required": ["rc"],
+      "additionalProperties": false
+    },
+    "data": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/device"
+      }
+    }
+  },
+  "required": ["meta", "data"],
+  "additionalProperties": false,
+
+  "$defs": {
+    "device": {
+      "type": "object",
+      "properties": {
+        "site": {"type": "string"},
+        "assoc_time": {"type": "number"},
+        "latest_assoc_time": {"type": "number"},
+        "user_id": {"type": "string"},
+        "_id": {"type": "string"},
+        "mac": {"type": "string"},
+        "site_id": {"type": "string"},
+        "oui": {"type": "string"},
+        "is_guest": {"type": "boolean"},
+        "first_seen": {"type": "number"},
+        "last_seen": {"type": "number"},
+        "is_wired": {"type": "boolean"},
+        "usergroup_id": {"type": "string"},
+        "hostname": {"type": "string"},
+        "disconnect_timestamp": {"type": "number"},
+        "wlanconf_id": {"type": "string"},
+        "_uptime_by_uap": {"type": "number"},
+        "_last_seen_by_uap": {"type": "number"},
+        "_is_guest_by_uap": {"type": "boolean"},
+        "ap_mac": {"type": "string"},
+        "channel": {"type": "number"},
+        "radio": {"type": "string"},
+        "radio_name": {"type": "string"},
+        "essid": {"type": "string"},
+        "bssid": {"type": "string"},
+        "powersave_enabled": {"type": "boolean"},
+        "is_11r": {"type": "boolean"},
+        "user_group_id_computed": {"type": "string"},
+        "anomalies": {"type": "number"},
+        "anon_client_id": {"type": "string"},
+        "ccq": {"type": "number"},
+        "dhcpend_time": {"type": "number"},
+        "idletime": {"type": "number"},
+        "ip": {"type": "string"},
+        "noise": {"type": "number"},
+        "nss": {"type": "number"},
+        "rx_rate": {"type": "number"},
+        "rssi": {"type": "number"},
+        "satisfaction": {"type": "number"},
+        "satisfaction_now": {"type": "number"},
+        "satisfaction_real": {"type": "number"},
+        "satisfaction_reason": {"type": "number"},
+        "signal": {"type": "number"},
+        "tx_mcs": {"type": "number"},
+        "tx_power": {"type": "number"},
+        "tx_rate": {"type": "number"},
+        "hostname_source": {"type": "string"},
+        "vlan": {"type": "number"},
+        "radio_proto": {"type": "string"},
+        "uptime": {"type": "number"},
+        "tx_bytes": {"type": "number"},
+        "rx_bytes": {"type": "number"},
+        "tx_packets": {"type": "number"},
+        "rx_packets": {"type": "number"},
+        "bytes-r": {"type": "number"},
+        "tx_bytes-r": {"type": "number"},
+        "rx_bytes-r": {"type": "number"},
+        "tx_retries": {"type": "number"},
+        "wifi_tx_attempts": {"type": "number"},
+        "authorized": {"type": "boolean"},
+        "qos_policy_applied": {"type": "boolean"},
+        "roam_count": {"type": "number"},
+        "_is_guest_by_ugw": {"type": "boolean"},
+        "_is_guest_by_usw":  {"type": "boolean"},
+        "_last_seen_by_ugw": {"type": "number"},
+        "_last_seen_by_usw": {"type": "number"},
+        "_uptime_by_ugw": {"type": "number"},
+        "_uptime_by_usw": {"type": "number"},
+        "eagerly_discovered": {"type": ["boolean", "null"]},
+        "gw_mac": {"type": "string"},
+        "network": {"type": "string"},
+        "network_id": {"type": "string"},
+        "sw_depth": {"type": "number"},
+        "sw_mac": {"type": "string"},
+        "sw_port": {"type": "number"},
+        "wired-rx_bytes": {"type": "number"},
+        "wired-rx_bytes-r": {"type": "number"},
+        "wired-rx_packets": {"type": "number"},
+        "wired-tx_bytes": {"type": "number"},
+        "wired-tx_bytes-r": {"type": "number"},
+        "wired-tx_packets": {"type": "number"},
+        "wired_rate_mbps": {"type": "number"},
+        "dev_cat": {"type": "number"},
+        "dev_family": {"type": "number"},
+        "dev_id": {"type": "number"},
+        "dev_vendor": {"type": "number"},
+        "os_class": {"type": "number"},
+        "os_name": {"type": "number"},
+        "satisfaction_avg": {
+          "type": "object",
+          "properties": {
+            "total": {"type": "number"},
+            "count": {"type": "number"}
+          },
+          "required": ["total", "count"],
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false,
+      "required": ["last_seen", "is_wired", "usergroup_id", "qos_policy_applied", "satisfaction", "user_id", "satisfaction_avg", "is_guest", "authorized", "first_seen", "site_id", "ip", "latest_assoc_time", "_id", "oui", "assoc_time", "mac", "tx_retries", "anomalies", "uptime", "wifi_tx_attempts"],
+      "patternProperties" : {"^x_": {}}
+    }
+  }
+}

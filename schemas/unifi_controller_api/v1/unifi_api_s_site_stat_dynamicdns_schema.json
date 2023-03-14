@@ -1,0 +1,25 @@
+{
+  "$id": "https://example.com/unifi_api_site_stat_dynamicdns",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Unifi Controller API site dynamic dns",
+  "type": "object",
+  "properties": {
+    "meta": {
+      "type": "object",
+      "properties": {
+        "rc": {
+          "type": "string",
+          "enum": ["ok"]
+        }
+      },
+      "required": ["rc"],
+      "additionalProperties": false
+    },
+    "data": {
+      "type": "array"
+    }
+  },
+  "required": ["meta", "data"],
+  "additionalProperties": false
+
+}

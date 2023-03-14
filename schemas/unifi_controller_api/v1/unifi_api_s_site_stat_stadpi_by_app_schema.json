@@ -1,0 +1,67 @@
+{
+  "$id": "https://example.com/unifi_api_s_site_stadpi",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Unifi Controller API device DPI stats",
+  "type": "object",
+  "properties": {
+    "meta": {
+      "type": "object",
+      "properties": {
+        "rc": {
+          "type": "string",
+          "enum": ["ok"]
+        }
+      },
+      "required": ["rc"],
+      "additionalProperties": false
+    },
+    "data": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/device_stat"
+      }
+    }
+  },
+  "required": ["meta", "data"],
+  "additionalProperties": false,
+
+  "$defs": {
+    "device_stat": {
+      "type": "object",
+      "properties": {
+        "mac": {"type": "string"},
+        "last_updated": {"type": "number"},
+        "by_app": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "cat": {
+                "type": "number"
+              },
+              "app": {
+                "type": "number"
+              },
+              "rx_bytes": {
+                "type": "number"
+              },
+              "tx_bytes": {
+                "type": "number"
+              },
+              "rx_packets": {
+                "type": "number"
+              },
+              "tx_packets": {
+                "type": "number"
+              }
+            },
+            "patternProperties" : {"^x_": {}},
+            "additionalProperties": false
+          }
+        }
+      },
+      "patternProperties" : {"^x_": {}},
+      "additionalProperties": false
+    }
+  }
+}

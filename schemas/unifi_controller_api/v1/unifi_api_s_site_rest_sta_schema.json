@@ -1,0 +1,50 @@
+{
+  "$id": "https://example.com/unifi_api_s_site_rest_sta",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Unifi Controller API Known Site Clients",
+  "type": "object",
+  "properties": {
+    "meta": {
+      "type": "object",
+      "properties": {
+        "rc": {
+          "type": "string",
+          "enum": ["ok"]
+        }
+      },
+      "required": ["rc"],
+      "additionalProperties": false
+    },
+    "data": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/device"
+      }
+    }
+  },
+  "required": ["meta", "data"],
+  "additionalProperties": false,
+
+  "$defs": {
+    "device": {
+      "type": "object",
+      "properties": {
+        "_id": {"type": "string"},
+        "mac": {"type": "string"},
+        "site_id": {"type": "string"},
+        "oui": {"type": "string"},
+        "is_guest": {"type": "boolean"},
+        "first_seen": {"type": "number"},
+        "last_seen": {"type": "number"},
+        "is_wired": {"type": "boolean"},
+        "usergroup_id": {"type": "string"},
+        "hostname": {"type": "string"},
+        "disconnect_timestamp": {"type": "number"},
+        "wlanconf_id": {"type": "string"}
+      },
+      "additionalProperties": false,
+      "required": ["_id", "mac", "site_id", "oui", "is_guest", "first_seen", "last_seen", "is_wired"],
+      "patternProperties" : {"^x_": {}}
+    }
+  }
+}
