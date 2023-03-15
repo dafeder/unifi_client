@@ -1,0 +1,39 @@
+{
+  "$id": "https://example.com/unifi_api_self_sites",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Unifi Controller API Sites",
+  "type": "object",
+  "properties": {
+    "meta": {
+      "type": "object",
+      "properties": {
+        "rc": {
+          "type": "string",
+          "enum": ["ok"]
+        }
+      },
+      "required": ["rc"],
+      "additionalProperties": false
+    },
+    "data": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "_id": {"type": "string"},
+          "anonymous_id": {"type": "string"},
+          "name": {"type": "string"},
+          "desc": {"type": "string"},
+          "attr_hidden_id": {"type": "string"},
+          "attr_no_delete": {"type": "boolean"},
+          "role": {"type": "string"}
+        }
+      }
+    }
+  },
+  "required": ["meta", "data"],
+  "additionalProperties": false,
+
+  "$defs": {
+  }
+}

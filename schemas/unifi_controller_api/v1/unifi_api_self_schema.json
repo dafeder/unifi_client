@@ -1,0 +1,62 @@
+{
+  "$id": "https://example.com/unifi_api_self",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Unifi Controller API self",
+  "type": "object",
+  "properties": {
+    "meta": {
+      "type": "object",
+      "properties": {
+        "rc": {
+          "type": "string",
+          "enum": ["ok"]
+        }
+      },
+      "required": ["rc"],
+      "additionalProperties": false
+    },
+    "data": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "admin_id": {"type": "string"},
+          "device_id": {"type": "string"},
+          "email": {"type": "string"},
+          "email_alert_enabled": {"type": "boolean"},
+          "email_alert_grouping_delay": {"type": "number"},
+          "email_alert_grouping_enabled": {"type": "boolean"},
+          "html_email_enabled": {"type": "boolean"},
+          "is_owner": {"type": "boolean"},
+          "is_professional_installer": {"type": "boolean"},
+          "is_super": {"type": "boolean"},
+          "last_site_name": {"type": "string"},
+          "name": {"type": "string"},
+          "push_alert_enabled": {"type": "boolean"},
+          "requires_new_password": {"type": "boolean"},
+          "super_site_permissions": {
+            "type": "array",
+            "description": "don't know what this is an array of -rdp"
+          },
+          "ubic_name": {"type": "string"},
+          "ubic_uuid": {"type": "string"},
+          "surveys": {
+            "type": "object",
+            "description": "don't know the properties of this object -rdp"
+          },
+          "ui_settings": {
+            "type": "object",
+            "description": "don't know the properties of this object -rdp"
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      }
+    }
+  },
+  "required": ["meta", "data"],
+  "additionalProperties": false,
+
+  "$defs": {
+  }
+}
