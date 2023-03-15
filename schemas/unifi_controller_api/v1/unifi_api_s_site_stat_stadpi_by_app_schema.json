@@ -29,7 +29,7 @@
     "device_stat": {
       "type": "object",
       "properties": {
-        "mac": {"type": "string"},
+        "mac": {"type": ["string", "null"]},
         "last_updated": {"type": "number"},
         "by_app": {
           "type": "array",

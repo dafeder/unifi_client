@@ -76,24 +76,6 @@ controller_data_results_dict[f"run_speed_test ({site})"] = {"end_point": f"/api/
 
 controller_data_results_dict[f"status_speed_test ({site})"] = {"end_point": f"/api/s/{site}/cmd/devmgr", "result": unifi_client.status_speed_test(site)}
 
-with open("../local/ever_result.json", "w+") as jf:
-    json.dump(controller_data_results_dict, jf)
-
-#print(json.dumps(controller_data_results_dict, indent=4))
-
-# spd_run = unifi_client.run_speed_test("default")
-# print(json.dumps(spd_run, indent=4))
-# print(json.dumps(unifi_client.status_speed_test("default"), indent=4))
-
-# print(json.dumps(unifi_client.get_site_dpi_by_app("default"), indent=4))
-
-# Some examples of api calls
-
-# print(json.dumps(unifi_client.get_sites(), indent=4))
-# print(json.dumps(unifi_client.get_devices_for_default_site(), indent=4))
-# print(json.dumps(unifi_client.get_5min_ap_all_stats("default", *unifi_client.one_hour_ago()), indent=4))
-
-# Example of getting traffic stats and mapping the id value in the API results to human-readable
-# app_stats = unifi_client.get_dpi_by_app("default")
-# print(json.dumps(app_stats, indent=4))
+with open("local/every_result.json", "w+") as jf:
+    json.dump(controller_data_results_dict, jf, indent=4)
 

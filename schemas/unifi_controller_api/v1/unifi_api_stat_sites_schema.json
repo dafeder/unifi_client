@@ -1,0 +1,102 @@
+{
+  "$id": "https://example.com/unifi_api_stat_sites_schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Unifi Controller API Sites Stats",
+  "type": "object",
+  "properties": {
+    "meta": {
+      "type": "object",
+      "properties": {
+        "rc": {
+          "type": "string",
+          "enum": ["ok"]
+        }
+      },
+      "required": ["rc"],
+      "additionalProperties": false
+    },
+    "data": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/site_stat"
+      }
+    }
+  },
+  "required": ["meta", "data"],
+  "additionalProperties": false,
+
+  "$defs": {
+    "site_stat": {
+      "type": "object",
+      "properties": {
+        "_id": {"type": "string"},
+        "anonymous_id": {"type": "string"},
+        "name": {"type": "string"},
+        "desc": {"type": "string"},
+        "attr_hidden_id": {"type": "string"},
+        "attr_no_delete": {"type": "boolean"},
+        "num_new_alarms": {"type": "number"},
+        "health": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/site_subsystem_health_stat"
+          }
+        }
+      },
+      "required": [],
+      "additionalProperties": false
+    },
+    "site_subsystem_health_stat": {
+      "type": "object",
+      "properties": {
+        "subsystem": {"type": "string"},
+        "num_gw": {"type": "number"},
+        "num_adopted": {"type": "number"},
+        "num_disconnected": {"type": "number"},
+        "num_iot": {"type": "number"},
+        "num_guest": {"type": "number"},
+        "num_ap": {"type": "number"},
+        "num_disabled": {"type": "number"},
+        "num_user": {"type": "number"},
+        "num_pending": {"type": "number"},
+        "num_sw": {"type": "number"},
+        "lan_ip": {"type": "string"},
+        "status": {"type": "string"},
+        "wan_ip": {"type": "string"},
+        "gateways": {"type": "array", "items": {"type": ["string"]}},
+        "netmask": {"type": "string"},
+        "nameservers": {"type": "array", "items": {"type": ["string"]}},
+        "num_sta": {"type": "number"},
+        "tx_bytes-r": {"type": "number"},
+        "rx_bytes-r": {"type": "number"},
+        "gw_mac": {"type": "string"},
+        "gw_name": {"type": ["string", "null"]},
+        "gw_system-stats": {
+          "type": "object",
+          "properties": {
+            "cpu": {"type": "string"},
+            "mem": {"type": "string"},
+            "uptime": {"type": "string"}
+          },
+          "additionalProperties": false,
+          "required": []
+        },
+        "gw_version": {"type": "string"},
+        "drops": {"type": "number"},
+        "xput_up": {"type": "number"},
+        "xput_down": {"type": "number"},
+        "speedtest_status": {"type": "string"},
+        "speedtest_lastrun": {"type": "number"},
+        "speedtest_ping": {"type": "number"},
+        "latency": {"type": "number"},
+        "uptime": {"type": "number"},
+        "uptime_stats": {
+          "type": "object",
+          "description": "I don't know what all can be in uptime_stats"
+        }
+      },
+      "required": [],
+      "additionalProperties": false
+    }
+  }
+}

@@ -6,6 +6,7 @@ import hashlib
 import requests
 import jsbeautifier
 import yaml
+import jsonschema
 
 
 class UnifiAPIClientException(Exception):
@@ -24,6 +25,21 @@ class UnifiAPIClient:
     network_traffic_category_map_hash = None
     network_traffic_application_map = None
     network_traffic_application_map_hash = None
+
+    json_schema_rest_sta = None
+    json_schema_stat_device = None
+    json_schema_stat_dynamicdns = None
+    json_schema_stat_report_by_ap = None
+    json_schema_stat_report_by_site = None
+    json_schema_stat_report_by_user = None
+    json_schema_stat_sitedpi_by_app = None
+    json_schema_stat_sitedpi_by_category = None
+    json_schema_stat_sta = None
+    json_schema_stat_stadpi_by_app = None
+    json_schema_stat_stadpi_by_category = None
+    json_schema_api_self = None
+    json_schema_api_self_sites = None
+    json_schema_api_stat_sites = None
 
     def __init__(self,
                  controller_url,
@@ -67,6 +83,9 @@ class UnifiAPIClient:
             except UnifiAPIClientException:
                 self._logger.info(f"{self} could not get the category and application map. See log for details")
 
+        self._load_json_schemas()
+
+
     def get_self(self):
 
         url_self = self._unifi_controller_url + "/api/self"
@@ -77,6 +96,8 @@ class UnifiAPIClient:
             err_msg = f"{self} request to self endpoint {url_self} returned status code {self_response.status_code}. Expected 200"
             self._logger.error(err_msg)
             raise UnifiAPIClientException(err_msg)
+
+        jsonschema.validate(self_response.json(), self.json_schema_api_self)
 
         return self_response.json()
 
@@ -93,8 +114,8 @@ class UnifiAPIClient:
 
         self._logger.debug(f"Got sites from {url_sites} OK")
 
-        # TODO Write sites response JSON schema
-        # TODO Check sites response against JSON schema
+        jsonschema.validate(sites_response.json(), self.json_schema_api_self_sites)
+
         return sites_response.json()
 
     def get_self_site_stats(self):
@@ -110,8 +131,8 @@ class UnifiAPIClient:
 
         self._logger.debug(f"Got sites stats from {url_sites_stats} OK")
 
-        # TODO Write sites response JSON schema
-        # TODO Check sites response against JSON schema
+        jsonschema.validate(sites_stats_response.json(), self.json_schema_api_stat_sites)
+
         return sites_stats_response.json()
 
     def get_devices_for_site(self, site):
@@ -127,8 +148,8 @@ class UnifiAPIClient:
 
         self._logger.debug(f"Got site devices from {url_devices} OK")
 
-        # TODO Write sites response JSON schema
-        # TODO Check sites response against JSON schema
+        jsonschema.validate(site_devices_response.json(), self.json_schema_stat_device)
+
         return site_devices_response.json()
 
     def get_devices_for_default_site(self):
@@ -141,6 +162,8 @@ class UnifiAPIClient:
 
         supported_intervals = ['5minutes', 'hourly', 'daily']
         supported_element_types = ['site', 'user', 'ap']
+
+        # If the supported_element_types changes, don't for get to update the jsonschema.validate check later in this method
 
         if interval not in supported_intervals:
             raise ValueError(f"{self} invalid interval value {interval}. Must be one of {supported_intervals}")
@@ -166,18 +189,25 @@ class UnifiAPIClient:
         if filter_mac_list is not None and len(filter_mac_list) > 0:
             stat_request_parameters["macs"] = filter_mac_list
 
-        stat_device_response = self._controller_requests_session.post(url_stat,
+        stat_report_response = self._controller_requests_session.post(url_stat,
                                                                       headers={"content-type": "application/json"},
                                                                       data=json.dumps(stat_request_parameters))
 
-        if stat_device_response.status_code != 200:
-            err_msg = f"{self} request to site stat endpoint {url_stat} returned status code {stat_device_response.status_code}. Expected 200"
+        if stat_report_response.status_code != 200:
+            err_msg = f"{self} request to site stat report endpoint {url_stat} returned status code {stat_report_response.status_code}. Expected 200"
             self._logger.error(err_msg)
             raise UnifiAPIClientException(err_msg)
 
-        # TODO write site stats json schema
-        # TODO check stat_device_response json against site stats json schema
-        return stat_device_response.json()
+        if element_type == "ap":
+            jsonschema.validate(stat_report_response.json(), self.json_schema_stat_report_by_ap)
+        elif element_type == "user":
+            jsonschema.validate(stat_report_response.json(), self.json_schema_stat_report_by_user)
+        elif element_type == "site":
+            jsonschema.validate(stat_report_response.json(), self.json_schema_stat_report_by_site)
+        else:
+            raise UnifiAPIClientException(f"Don't know which JSON schema to check endpoint {url_stat} result. Value of element_type {element_type} isn't handled")
+
+        return stat_report_response.json()
 
     def get_5min_site_all_stats(self, site, start_epoch_timestamp_ms=None, end_epoch_timestamp_ms=None):
         return self.get_stats_for_site(site, "5minutes", "site",
@@ -238,8 +268,8 @@ class UnifiAPIClient:
 
         self._logger.debug(f"Got site active clients from {url_active_clients} OK")
 
-        # TODO Write sites active clients response JSON schema
-        # TODO Check sites active clients response against JSON schema
+        jsonschema.validate(site_active_clients_response.json(), self.json_schema_stat_sta)
+
         return site_active_clients_response.json()
 
     def get_known_clients_for_site(self, site):
@@ -256,8 +286,8 @@ class UnifiAPIClient:
 
         self._logger.debug(f"Got site known clients from {url_known_clients} OK")
 
-        # TODO Write sites known clients response JSON schema
-        # TODO Check sites known clients response against JSON schema
+        jsonschema.validate(site_known_clients_response.json(), self.json_schema_rest_sta)
+
         return site_known_clients_response.json()
 
     def DOES_NOT_WORK_get_spectrum_scan(self, site, filter_mac_list=None):
@@ -292,8 +322,8 @@ class UnifiAPIClient:
 
         self._logger.debug(f"Got site ddns info from {site_ddns_response} OK")
 
-        # TODO Write sites known clients response JSON schema
-        # TODO Check sites known clients response against JSON schema
+        jsonschema.validate(site_ddns_response.json(), self.json_schema_stat_dynamicdns)
+
         return site_ddns_response.json()
 
     def get_site_dpi_by_app(self, site, filter_category_list=None):
@@ -331,8 +361,8 @@ class UnifiAPIClient:
                 stat[
                     "x_cat_app_id"] = self.network_traffic_category_map_hash + ":" + self.network_traffic_application_map_hash
 
-        # TODO Write sites known clients response JSON schema
-        # TODO Check sites known clients response against JSON schema
+        jsonschema.validate(response_site_app_stats, self.json_schema_stat_sitedpi_by_app)
+
         return response_site_app_stats
 
     def get_site_dpi_by_category(self, site):
@@ -354,8 +384,8 @@ class UnifiAPIClient:
 
         self._logger.debug(f"Got site dpi by category info from {url_site_dpi} OK")
 
-        # TODO Write sites dpi by cat response JSON schema
-        # TODO Check sites dpi by cat response against JSON schema
+        jsonschema.validate(site_site_dpi_cat_response.json(), self.json_schema_stat_sitedpi_by_category)
+
         return site_site_dpi_cat_response.json()
 
     def get_dpi_by_app(self, site, filter_mac_list=None, filter_category_list=None):
@@ -395,8 +425,9 @@ class UnifiAPIClient:
                     stat["x_app"] = self.network_traffic_application_map.get(app_cat_id, {"name": "__unlisted__"})["name"]
                     stat["x_cat_app_id"] = self.network_traffic_category_map_hash + ":" + self.network_traffic_application_map_hash
 
-        # TODO Write sites known clients response JSON schema
-        # TODO Check sites known clients response against JSON schema
+
+        jsonschema.validate(response_app_stats, self.json_schema_stat_stadpi_by_app)
+
         return response_app_stats
 
     def get_dpi_by_category(self, site, filter_mac_list=None):
@@ -419,8 +450,8 @@ class UnifiAPIClient:
 
         self._logger.debug(f"Got site ddns info from {url_dpi} OK")
 
-        # TODO Write sites known clients response JSON schema
-        # TODO Check sites known clients response against JSON schema
+        jsonschema.validate(site_dpi_cat_response.json(), self.json_schema_stat_stadpi_by_category)
+
         return site_dpi_cat_response.json()
 
     def run_speed_test(self, site):
@@ -439,6 +470,7 @@ class UnifiAPIClient:
             raise UnifiAPIClientException(err_msg)
 
         self._logger.debug(f"Send speed test command {url_devmgr} OK")
+
 
         # TODO Write sites known clients response JSON schema
         # TODO Check sites known clients response against JSON schema
@@ -467,6 +499,57 @@ class UnifiAPIClient:
 
     def __str__(self):
         return f"UnifiAPIClient to {self._unifi_controller_url }"
+
+    def _load_json_schemas(self):
+
+
+        self._logger.debug("Loading up JSON schemas from disk")
+
+        json_schema_rest_sta_schema_file_path = "schemas/unifi_controller_api/v1/unifi_api_s_site_rest_sta_schema.json"
+        json_schema_stat_device_file_path = "schemas/unifi_controller_api/v1/unifi_api_s_site_stat_device.json"
+        json_schema_stat_dynamicdns_schema_file_path = "schemas/unifi_controller_api/v1/unifi_api_s_site_stat_dynamicdns_schema.json"
+        json_schema_stat_report_by_ap_schema_file_path = "schemas/unifi_controller_api/v1/unifi_api_s_site_stat_report_by_ap_schema.json"
+        json_schema_stat_report_by_site_file_path = "schemas/unifi_controller_api/v1/unifi_api_s_site_stat_report_by_site_schema.json"
+        json_schema_stat_report_by_user_file_path = "schemas/unifi_controller_api/v1/unifi_api_s_site_stat_report_by_user_schema.json"
+        json_schema_stat_sitedpi_by_app_file_path = "schemas/unifi_controller_api/v1/unifi_api_s_site_stat_sitedpi_by_app_schema.json"
+        json_schema_stat_sitedpi_by_category_file_path = "schemas/unifi_controller_api/v1/unifi_api_s_site_stat_sitedpi_by_category_schema.json"
+        json_schema_stat_sta_schema_file_path = "schemas/unifi_controller_api/v1/unifi_api_s_site_stat_sta_schema.json"
+        json_schema_stat_stadpi_by_app_file_path = "schemas/unifi_controller_api/v1/unifi_api_s_site_stat_stadpi_by_app_schema.json"
+        json_schema_stat_stadpi_by_category_file_path = "schemas/unifi_controller_api/v1/unifi_api_s_site_stat_stadpi_by_category_schema.json"
+        json_schema_api_self_schema_file_path = "schemas/unifi_controller_api/v1/unifi_api_self_schema.json"
+        json_schema_api_self_sites_file_path = "schemas/unifi_controller_api/v1/unifi_api_self_sites_schema.json"
+        json_schema_api_stat_sites_file_path = "schemas/unifi_controller_api/v1/unifi_api_stat_sites_schema.json"
+
+        with open(json_schema_rest_sta_schema_file_path) as json_schema_file:
+            self.json_schema_rest_sta = json.load(json_schema_file)
+        with open(json_schema_stat_device_file_path) as json_schema_file:
+            self.json_schema_stat_device = json.load(json_schema_file)
+        with open(json_schema_stat_dynamicdns_schema_file_path) as json_schema_file:
+            self.json_schema_stat_dynamicdns = json.load(json_schema_file)
+        with open(json_schema_stat_report_by_ap_schema_file_path) as json_schema_file:
+            self.json_schema_stat_report_by_ap = json.load(json_schema_file)
+        with open(json_schema_stat_report_by_site_file_path) as json_schema_file:
+            self.json_schema_stat_report_by_site = json.load(json_schema_file)
+        with open(json_schema_stat_report_by_user_file_path) as json_schema_file:
+            self.json_schema_stat_report_by_user = json.load(json_schema_file)
+        with open(json_schema_stat_sitedpi_by_app_file_path) as json_schema_file:
+            self.json_schema_stat_sitedpi_by_app = json.load(json_schema_file)
+        with open(json_schema_stat_sitedpi_by_category_file_path) as json_schema_file:
+            self.json_schema_stat_sitedpi_by_category = json.load(json_schema_file)
+        with open(json_schema_stat_sta_schema_file_path) as json_schema_file:
+            self.json_schema_stat_sta = json.load(json_schema_file)
+        with open(json_schema_stat_stadpi_by_app_file_path) as json_schema_file:
+            self.json_schema_stat_stadpi_by_app = json.load(json_schema_file)
+        with open(json_schema_stat_stadpi_by_category_file_path) as json_schema_file:
+            self.json_schema_stat_stadpi_by_category = json.load(json_schema_file)
+        with open(json_schema_api_self_schema_file_path) as json_schema_file:
+            self.json_schema_api_self = json.load(json_schema_file)
+        with open(json_schema_api_self_sites_file_path) as json_schema_file:
+            self.json_schema_api_self_sites = json.load(json_schema_file)
+        with open(json_schema_api_stat_sites_file_path) as json_schema_file:
+            self.json_schema_api_stat_sites = json.load(json_schema_file)
+        self._logger.debug("Done loading up JSON schemas from disk")
+
 
 
     def get_category_and_application_map(self, angular_build_str_list=None):

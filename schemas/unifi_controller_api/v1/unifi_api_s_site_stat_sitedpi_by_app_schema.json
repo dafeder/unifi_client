@@ -38,6 +38,9 @@
               "cat": {
                 "type": "number"
               },
+              "known_clients": {
+                "type": "number"
+              },
               "app": {
                 "type": "number"
               },
