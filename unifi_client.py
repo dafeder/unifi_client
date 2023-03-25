@@ -596,7 +596,7 @@ class UnifiAPIClient:
             self._logger.error(err_msg)
             raise UnifiAPIClientException(err_msg)
 
-        mg = re.match(r".*categories: (.*),.*            applications:(.*)}\n    \}, \{\}\],\n    2\:",
+        mg = re.match(r".*categories: (.*),.* {12}applications:(.*)}\n {4}}, \{}],\n {4}2:",
                       beautified_dpi_js, re.DOTALL).groups()
 
         if len(mg) != 2:
