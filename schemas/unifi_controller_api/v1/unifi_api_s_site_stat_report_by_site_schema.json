@@ -22,18 +22,7 @@
     "data": {
       "type": "array",
       "items": {
-        "$ref": "#/$defs/site_traffic_stat"
-      }
-    }
-  },
-  "required": [
-    "meta",
-    "data"
-  ],
-  "additionalProperties": false,
-  "$defs": {
-    "site_traffic_stat": {
-      "type": "object",
+             "type": "object",
       "properties": {
         "wan-tx_bytes": {"type": "number"},
         "wan-rx_bytes": {"type": "number"},
@@ -48,7 +37,14 @@
       },
       "required": ["oid","o","site","time","wlan-num_sta","lan-num_sta","num_sta","wan-tx_bytes", "wan-rx_bytes", "wlan_bytes"],
       "additionalProperties": false
+
+      }
     }
-  }
+  },
+  "required": [
+    "meta",
+    "data"
+  ],
+  "additionalProperties": false,
 }
 
