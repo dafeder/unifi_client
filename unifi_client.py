@@ -497,6 +497,46 @@ class UnifiAPIClient:
         # TODO Check sites known clients response against JSON schema
         return speed_test_response.json()
 
+
+    def get_events(self, site):
+
+        url_get_alarms = self._unifi_controller_url + "/api/s/" + site + "/stat/event"
+
+        get_alarms_response = self._controller_requests_session.post(url_get_alarms,
+                                                                     headers={"content-type": "application/json"}
+                                                                     )
+
+        if get_alarms_response.status_code != 200:
+            err_msg = f"{self} request to alarm {url_get_alarms} returned status code {get_alarms_response.status_code}. Expected 200"
+            self._logger.error(err_msg)
+            raise UnifiAPIClientException(err_msg)
+
+        self._logger.debug(f"Get alarms command {url_get_alarms} OK")
+
+        # TODO Write alarms response JSON schema
+        # TODO Check alarms response against JSON schema
+        return get_alarms_response.json()
+
+
+    def get_alarms(self, site, most_recent_first=True):
+
+        url_get_alarms = self._unifi_controller_url + "/api/s/" + site + "/stat/alarm"
+
+        get_alarms_response = self._controller_requests_session.post(url_get_alarms,
+                                                                     headers={"content-type": "application/json"}
+                                                                     )
+
+        if get_alarms_response.status_code != 200:
+            err_msg = f"{self} request to alarm {url_get_alarms} returned status code {get_alarms_response.status_code}. Expected 200"
+            self._logger.error(err_msg)
+            raise UnifiAPIClientException(err_msg)
+
+        self._logger.debug(f"Get alarms command {url_get_alarms} OK")
+
+        # TODO Write alarms response JSON schema
+        # TODO Check alarms response against JSON schema
+        return get_alarms_response.json()
+
     def __str__(self):
         return f"UnifiAPIClient to {self._unifi_controller_url }"
 
