@@ -22,7 +22,7 @@
     "data": {
       "type": "array",
       "items": {
-        "$ref": "#/$defs/site_traffic_stat"
+        "$ref": "#/components/site_traffic_stat"
       }
     }
   },
@@ -31,7 +31,7 @@
     "data"
   ],
   "additionalProperties": false,
-  "$defs": {
+  "components": {
     "site_traffic_stat": {
       "type": "object",
       "properties": {

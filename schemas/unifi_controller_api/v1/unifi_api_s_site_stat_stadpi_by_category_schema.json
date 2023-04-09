@@ -18,14 +18,14 @@
     "data": {
       "type": "array",
       "items": {
-        "$ref": "#/$defs/device_stat"
+        "$ref": "#/components/device_stat"
       }
     }
   },
   "required": ["meta", "data"],
   "additionalProperties": false,
 
-  "$defs": {
+  "components": {
     "device_stat": {
       "type": "object",
       "properties": {

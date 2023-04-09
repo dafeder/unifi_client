@@ -18,14 +18,14 @@
     "data": {
       "type": "array",
       "items": {
-        "$ref": "#/$defs/site_stat"
+        "$ref": "#/components/site_stat"
       }
     }
   },
   "required": ["meta", "data"],
   "additionalProperties": false,
 
-  "$defs": {
+  "components": {
     "site_stat": {
       "type": "object",
       "properties": {

@@ -18,14 +18,14 @@
     "data": {
       "type": "array",
       "items": {
-        "$ref": "#/$defs/device"
+        "$ref": "#/components/device"
       }
     }
   },
   "required": ["meta", "data"],
   "additionalProperties": false,
 
-  "$defs": {
+  "components": {
     "device": {
       "type": "object",
       "properties": {

@@ -18,14 +18,14 @@
     "data": {
       "type": "array",
       "items": {
-        "$ref": "#/$defs/device"
+        "$ref": "#/components/device"
       }
     }
   },
   "required": ["meta", "data"],
   "additionalProperties": false,
 
-  "$defs": {
+  "components": {
     "device": {
       "type": "object",
       "properties": {
@@ -88,7 +88,7 @@
         "port_table": {
           "type": "array",
           "items": {
-            "$ref": "#/$defs/device_port"
+            "$ref": "#/components/device_port"
           }
         },
         "power_source_ctrl_enabled": {"type": "boolean"},
@@ -288,7 +288,7 @@
         "ssh_session_table": {"type": "array"},
         "lldp_table": {
           "type": "array",
-          "items": {"$ref": "#/$defs/lldp_table_entry"}
+          "items": {"$ref": "#/components/lldp_table_entry"}
         },
         "displayable_version": {"type": "string"},
         "connection_network_name": {"type": "string"},
@@ -301,7 +301,7 @@
         "downlink_table": {
           "type": "array",
           "items": {
-            "$ref": "#/$defs/downlink_table_entry"
+            "$ref": "#/components/downlink_table_entry"
           }
         },
         "uplink_depth": {"type": "number"},
@@ -309,7 +309,7 @@
         "stat": {
           "type": "object",
           "properties": {
-            "sw": {"$ref": "#/$defs/stat_sw"}
+            "sw": {"$ref": "#/components/stat_sw"}
           }
         },
         "tx_bytes": {"type": "number"},
@@ -367,7 +367,7 @@
         "aggregated_by": {"type": "boolean"},
         "mac_table": {
           "type": "array",
-          "items": {"$ref": "#/$defs/mac_table_entry"}
+          "items": {"$ref": "#/components/mac_table_entry"}
         }
       }
     },

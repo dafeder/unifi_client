@@ -57,6 +57,6 @@
   "required": ["meta", "data"],
   "additionalProperties": false,
 
-  "$defs": {
+  "components": {
   }
 }
